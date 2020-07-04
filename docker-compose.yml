@@ -1,0 +1,61 @@
+version: "3.8"
+services: 
+  web:
+    image: suzel/docker-processwire
+    environment:
+      - ALLOW_OVERRIDE=true
+    ports:
+      - "8080:80"
+    links:
+      - db
+    volumes:
+      - ./app:/var/www/html/
+
+  db:
+    image: mariadb
+    restart: always
+    # env_file:
+    #   - ./db_connection.env
+    volumes:
+      - ${PWD}/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+    ports:
+      - "9001:3306"
+    # networks:
+    #   - dev
+
+  # mysql_seed:
+  #   build: ./mysql_seed
+  #   # networks:
+  #   #   - dev
+  #   depends_on:
+  #     - db
+  #   links:
+  #     - db
+
+
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8081:8080
+    links:
+      - db
+
+
+#
+# [ volumes definition ]
+#
+# creates Docker volumes which can be mounted by other containers too e.g. for backup
+#
+# volumes:
+#   data-mysql:
+#     driver_opts:
+#       type: none
+#       device: ${PWD}/mysql
+#       o: bind
